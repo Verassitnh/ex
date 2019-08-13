@@ -8,6 +8,9 @@
   },
   "keywords": [],
   "author": "",
+  "bin": {
+    "ex": "bin/ex"
+  },
   "license": "ISC",
   "dependencies": {}
 }
