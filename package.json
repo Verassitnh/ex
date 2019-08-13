@@ -12,5 +12,7 @@
     "ex": "bin/ex"
   },
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "minimist": "^1.2.0"
+  }
 }

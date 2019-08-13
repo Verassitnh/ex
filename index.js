@@ -1,13 +1,42 @@
 const { execSync } = require('child_process');
+const minimist = require('minimist')
 const fs = require('fs');
-const { spawnSync } = require('child_process');
 
-console.log("Cloning...")
-execSync('git clone https://github.com/svelte-toolbox/website project');
-console.log("Cloned");
-console.log("Building...")
-execSync('cd project && npm i && npm run build');
-console.log("Built!")
-console.log("Starting Server...")
-execSync('cd project && rm -Rf src cypress .eslintrc .prettierrc .prettierignore .eslintignore .git package.json package-lock.json');
-execSync('cd project && node __sapper__/build');
+module.exports = () => {
+	const args = minimist(process.argv.slice(2))
+	const url = args._[0]
+	const port = args._[1];
+	const runSudo = args._[2] == 'sudo';
+
+	if (!url) {
+		console.log("You must specify a repository url!");
+		return;
+	} else if (!port) {
+		console.log("You must specify a port!");
+		return;
+	}
+
+	console.log("Cloning...")
+	execSync(`rm -Rf project && git clone ${url} project`);
+	console.log("Cloned");
+	console.log("Building...")
+	execSync('cd project && export env NODE_ENV=develoment && npm i && npm run build');
+	console.log("Built!")
+	console.log("Starting Server...")
+	const files = fs.readdirSync('./project').map(val => {
+		if (
+			val != '__sapper__' &&
+			val != 'static' &&
+			val != 'package.json' &&
+			val != 'package-lock.json'
+		) return val;
+	}).join(' ')
+	execSync(`
+		cd project &&
+		rm -Rf ${files} &&
+		export env NODE_ENV=production &&
+		npm i &&
+		rm -Rf package.json package-lock.json &&
+		${runSudo ? 'sudo ' : ''}PORT=443 /usr/local/bin/node /home/vehmloewff/Code/user/project/__sapper__/build/
+	`);
+}
