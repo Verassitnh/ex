@@ -4,9 +4,8 @@ const fs = require('fs');
 
 module.exports = () => {
 	const args = minimist(process.argv.slice(2))
-	const url = args._[0]
 	const port = args._[1];
-	const runSudo = args._[2] == 'sudo';
+	const url = args._[0]
 
 	if (!url) {
 		console.log("You must specify a repository url!");
@@ -37,6 +36,6 @@ module.exports = () => {
 		export env NODE_ENV=production &&
 		npm i &&
 		rm -Rf package.json package-lock.json &&
-		${runSudo ? 'sudo ' : ''}PORT=443 /usr/local/bin/node /home/vehmloewff/Code/user/project/__sapper__/build/
+		export env PORT=${port} && node "./__sapper__/build"
 	`);
 }
